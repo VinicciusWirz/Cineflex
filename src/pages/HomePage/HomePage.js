@@ -1,30 +1,38 @@
-import styled from "styled-components"
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import styled from "styled-components";
 
 export default function HomePage() {
+    const [moviesList, setMoviesList] = useState(null);
+    useEffect(() => {
+        const url = "https://mock-api.driven.com.br/api/v8/cineflex/movies";
+        const promise = axios.get(url);
+        promise.then((answer) => setMoviesList(answer.data));
+        promise.catch((error) => setMoviesList(error.response.data));
+    }, []);
+    if (moviesList === null) {
+        return <PageContainer>Carregando...</PageContainer>
+    }
+    if (moviesList === 'Not Found') {
+        return <PageContainer>{moviesList}</PageContainer>
+    }
     return (
         <PageContainer>
             Selecione o filme
 
             <ListContainer>
-                <MovieContainer>
-                    <img src={"https://br.web.img2.acsta.net/pictures/22/05/16/17/59/5165498.jpg"} alt="poster"/>
-                </MovieContainer>
-
-                <MovieContainer>
-                    <img src={"https://br.web.img2.acsta.net/pictures/22/05/16/17/59/5165498.jpg"} alt="poster"/>
-                </MovieContainer>
-
-                <MovieContainer>
-                    <img src={"https://br.web.img2.acsta.net/pictures/22/05/16/17/59/5165498.jpg"} alt="poster"/>
-                </MovieContainer>
-
-                <MovieContainer>
-                    <img src={"https://br.web.img2.acsta.net/pictures/22/05/16/17/59/5165498.jpg"} alt="poster"/>
-                </MovieContainer>
+                {moviesList.map((movie) => (
+                    <MovieContainer key={movie.id} data-test="movie">
+                        <Link to={"/sessoes/" + movie.id}>
+                            <img src={movie.posterURL} alt="poster" />
+                        </Link>
+                    </MovieContainer>
+                ))}
             </ListContainer>
 
         </PageContainer>
-    )
+    );
 }
 
 const PageContainer = styled.div`
@@ -58,4 +66,4 @@ const MovieContainer = styled.div`
         width: 130px;
         height: 190px;
     }
-`
+`;
