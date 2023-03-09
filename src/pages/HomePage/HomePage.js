@@ -5,18 +5,22 @@ import styled from "styled-components";
 
 export default function HomePage() {
     const [moviesList, setMoviesList] = useState(null);
+
     useEffect(() => {
         const url = "https://mock-api.driven.com.br/api/v8/cineflex/movies";
         const promise = axios.get(url);
         promise.then((answer) => setMoviesList(answer.data));
         promise.catch((error) => setMoviesList(error.response.data));
     }, []);
+
     if (moviesList === null) {
         return <PageContainer>Carregando...</PageContainer>
     }
+
     if (moviesList === 'Not Found') {
         return <PageContainer>{moviesList}</PageContainer>
     }
+
     return (
         <PageContainer>
             Selecione o filme
@@ -24,7 +28,7 @@ export default function HomePage() {
             <ListContainer>
                 {moviesList.map((movie) => (
                     <MovieContainer key={movie.id} data-test="movie">
-                        <Link to={"/sessoes/" + movie.id}>
+                        <Link to={`/sessoes/${movie.id}`}>
                             <img src={movie.posterURL} alt="poster" />
                         </Link>
                     </MovieContainer>
