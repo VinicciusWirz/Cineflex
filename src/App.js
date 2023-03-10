@@ -7,10 +7,10 @@ import SessionsPage from "./pages/SessionsPage/SessionsPage";
 import SuccessPage from "./pages/SuccessPage/SuccessPage";
 
 export default function App() {
-    const [orderInfo, setOrderInfo] = useState({ movie: '', time: '', date: '', clientInfo: { name: '', cpf: '', seats: [] } });
+    const [orderInfo, setOrderInfo] = useState({ movie: '', time: '', date: '', clientInfo: { clients: [], seats: [] } });
 
     function clearAll() {
-        setOrderInfo({ movie: '', time: '', date: '', clientInfo: { name: '', cpf: '', seats: [] } });
+        setOrderInfo({ movie: '', time: '', date: '', clientInfo: { clients: [], seats: [] } });
     }
 
     return (

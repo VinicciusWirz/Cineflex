@@ -12,14 +12,11 @@ export default function SeatsPage(props) {
     const { idFilme } = useParams();
     const [movieSeats, setMovieSeats] = useState(null);
     const [selectedSeats, setSelectedSeats] = useState([]);
-    const [clientName, setClientName] = useState('');
-    const [clientCPF, setClientCPF] = useState('');
     const [seatsNames, setSeatsNames] = useState([]);
     const [movieId, setMovieId] = useState(0);
+    const [buyers, setBuyers] = useState([]);
     useEffect(() => {
         const url = `https://mock-api.driven.com.br/api/v8/cineflex/showtimes/${idFilme}/seats`;
-        setClientName('');
-        setClientCPF('');
         setSelectedSeats([]);
         setSeatsNames([]);
         props.setOrderInfo({
@@ -27,11 +24,11 @@ export default function SeatsPage(props) {
             time: '',
             date: '',
             clientInfo: {
-                name: '',
-                cpf: '',
+                clients: [],
                 seats: []
             }
         });
+        setBuyers([]);
         const promise = axios.get(url);
         promise.then(({ data }) => {
             setMovieSeats(data);
@@ -40,12 +37,12 @@ export default function SeatsPage(props) {
                 time: data.name,
                 date: data.day.date,
                 clientInfo: {
-                    name: '',
-                    cpf: '',
+                    clients: [],
                     seats: []
                 }
             });
             setMovieId(data.movie.id);
+            setBuyers([]);
         });
         promise.catch((error) => console.log(error.response.data));
     }, []);
@@ -65,12 +62,29 @@ export default function SeatsPage(props) {
             if (!selectedSeatsArr.includes(seatId)) {
                 setSelectedSeats(seatsAddedArr);
                 setSeatsNames(seatsNumbersAddedArr.sort((a, b) => parseInt(a) - parseInt(b)));
+                setBuyers([...buyers, { id: seatId, nome: '', cpf: '' }].sort((a, b) => parseInt(a) - parseInt(b)));
             } else {
-                setSelectedSeats(seatsRemovedArr);
-                setSeatsNames(seatsNumbersRemovedArr.sort((a, b) => parseInt(a) - parseInt(b)));
+                const deletionConfirmation = `Você deseja desselecionar o assento ${seatNumber}?`;
+                if (window.confirm(deletionConfirmation) === true) {
+                    setSelectedSeats(seatsRemovedArr);
+                    setSeatsNames(seatsNumbersRemovedArr.sort((a, b) => parseInt(a) - parseInt(b)));
+                    setBuyers(buyers.filter((e) => e.id !== seatId));
+                }
             }
         } else {
             alert('Assento indisponivel, por favor selecione outro');
+        }
+    }
+
+    function handleInputsChanges(event, index, type) {
+        const updateInputs = [...buyers];
+        if (type === 'nome') {
+            updateInputs[index].nome = event;
+            setBuyers(updateInputs);
+        }
+        if (type === 'cpf') {
+            updateInputs[index].cpf = event;
+            setBuyers(updateInputs);
         }
     }
 
@@ -109,8 +123,7 @@ export default function SeatsPage(props) {
                 </CaptionContainer>
 
                 <FormContainer onSubmit={(event) => handleSubmit(
-                    clientCPF,
-                    clientName,
+                    buyers,
                     selectedSeats,
                     navigate,
                     event,
@@ -118,23 +131,45 @@ export default function SeatsPage(props) {
                     props.orderInfo,
                     seatsNames)}
                 >
-                    <label htmlFor='name'>Nome do Comprador:</label>
-                    <input
-                        id='name'
-                        placeholder="Digite seu nome..."
-                        data-test="client-name"
-                        onChange={(e) => setClientName(e.target.value)}
-                        value={clientName}
-                        required />
+                    {seatsNames.length > 0 ? seatsNames.map((buyerSeat, i) =>
+                        <div key={buyerSeat}>
+                            <label htmlFor={`name${i}`} >{`Nome do Comprador ${buyerSeat}:`}</label>
+                            <input
+                                id={`name${i}`}
+                                placeholder="Digite seu nome..."
+                                data-test="client-name"
+                                onChange={(e) => handleInputsChanges(e.target.value, i, 'nome')}
+                                value={buyers[i].nome}
+                                required />
 
-                    <label htmlFor='cpf'>CPF do Comprador:</label>
-                    <input
-                        id='cpf'
-                        placeholder="Digite seu CPF..."
-                        data-test="client-cpf"
-                        onChange={(e) => setClientCPF(e.target.value)}
-                        value={clientCPF}
-                        required />
+                            <label htmlFor={`cpf${i}`}>{`CPF do Comprador ${buyerSeat}:`}</label>
+                            <input
+                                id={`cpf${i}`}
+                                placeholder="Digite seu CPF..."
+                                data-test="client-cpf"
+                                onChange={(e) => handleInputsChanges(e.target.value, i, 'cpf')}
+                                value={buyers[i].cpf}
+                                required />
+                        </div>
+                    ) :
+                        <div>
+                            <label htmlFor='name' >Nome do Comprador:</label>
+                            <input
+                                id='name'
+                                placeholder="Digite seu nome..."
+                                data-test="client-name"
+                                value=""
+                                disabled
+                                required />
+
+                            <label htmlFor='cpf'>CPF do Comprador:</label>
+                            <input
+                                id='cpf'
+                                placeholder="Digite seu CPF..."
+                                data-test="client-cpf"
+                                disabled
+                                required />
+                        </div>}
 
                     <button data-test="book-seat-btn" type='submit'>
                         Reservar Assento(s)
@@ -155,15 +190,15 @@ export default function SeatsPage(props) {
     );
 }
 
-function handleSubmit(clientCPF, clientName, selectedSeats, navigate, event, setOrderInfo, orderInfo, seatsNames) {
+function handleSubmit(buyers, selectedSeats, navigate, event, setOrderInfo, orderInfo, seatsNames) {
     event.preventDefault();
-    const isCPFValid = clientCPF.replace(/\D+/gi, '').length === 11;
-    const areThereSeatsSelected = selectedSeats.length !== 0;
-    if (isCPFValid && clientName && areThereSeatsSelected) {
-        const newOrder = { ...orderInfo };
-        newOrder.clientInfo = { name: clientName, cpf: clientCPF, seats: seatsNames };
+    const isCPFValid = cpfValidation(buyers);
+    const howManyBuyers = buyers.length;
+    const newOrder = { ...orderInfo };
+    newOrder.clientInfo = { clients: buyers, seats: seatsNames };
+    if (isCPFValid && howManyBuyers > 1) {
         setOrderInfo(newOrder);
-        const body = { ids: selectedSeats, name: clientName, cpf: clientCPF };
+        const body = { ids: selectedSeats, buyers };
         const url = 'https://mock-api.driven.com.br/api/v8/cineflex/seats/book-many';
         const promise = axios.post(url, body);
         promise.then(() => {
@@ -171,4 +206,20 @@ function handleSubmit(clientCPF, clientName, selectedSeats, navigate, event, set
         });
         promise.catch((error) => console.log(error.response.data));
     }
+    if (isCPFValid && howManyBuyers === 1) {
+        setOrderInfo(newOrder);
+        const body = { ids: selectedSeats, name: buyers[0].nome, cpf: buyers[0].cpf };
+        const url = 'https://mock-api.driven.com.br/api/v8/cineflex/seats/book-many';
+        const promise = axios.post(url, body);
+        promise.then(() => {
+            navigate('/sucesso');
+        });
+        promise.catch((error) => console.log(error.response.data));
+    }
+}
+
+function cpfValidation(buyers) {
+    let aux = 0;
+    buyers.forEach((b) => b.cpf.replace(/\D+/gi, '').length === 11 && aux++);
+    return aux === buyers.length;
 }

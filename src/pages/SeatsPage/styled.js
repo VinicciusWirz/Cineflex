@@ -30,6 +30,10 @@ export const FormContainer = styled.form`
     align-items: flex-start;
     margin: 20px 0;
     font-size: 18px;
+    div{
+        display:flex;
+        flex-wrap: wrap;
+    }
     button, a {
         align-self: center;
         text-decoration: none;
