@@ -22,15 +22,15 @@ export default function App() {
             </NavContainer>
 
             <Routes>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/sessoes/:idFilme" element={<SessionsPage />} />
+                <Route path="/" element={<HomePage clearAll={clearAll} />} />
+                <Route path="/sessoes/:idFilme" element={<SessionsPage clearAll={clearAll} />} />
                 <Route path="/assentos/:idFilme" element={<SeatsPage setOrderInfo={setOrderInfo} orderInfo={orderInfo} />} />
-                <Route path="/sucesso" element={<SuccessPage orderInfo={orderInfo} clearAll={clearAll} />}
-                />
+                <Route path="/sucesso" element={<SuccessPage orderInfo={orderInfo} clearAll={clearAll} />} />
             </Routes>
         </BrowserRouter>
     );
 }
+
 
 const NavContainer = styled.div`
     width: 100%;
@@ -47,5 +47,9 @@ const NavContainer = styled.div`
     a {
         text-decoration: none;
         color: #E8833A;
+    }
+    img {
+        position: absolute;
+        left: 0;
     }
 `;

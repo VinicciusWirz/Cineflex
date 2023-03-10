@@ -3,8 +3,9 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import loading from "../../assets/loading.svg";
+import NavBar from "../../components/NavBar";
 
-export default function HomePage() {
+export default function HomePage({ clearAll }) {
     const [moviesList, setMoviesList] = useState(null);
 
     useEffect(() => {
@@ -15,7 +16,7 @@ export default function HomePage() {
     }, []);
 
     if (moviesList === null) {
-        return <PageContainer><img src={loading}/></PageContainer>
+        return <PageContainer><img src={loading} /></PageContainer>
     }
 
     if (moviesList === 'Not Found') {

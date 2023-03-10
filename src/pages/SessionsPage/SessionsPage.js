@@ -3,8 +3,10 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { PageContainer, ButtonsContainer, SessionContainer, FooterContainer } from "./styled";
 import loading from "../../assets/loading.svg";
+import arrow from "../../assets/arrow.png";
+import NavBar from "../../components/NavBar";
 
-export default function SessionsPage() {
+export default function SessionsPage({ clearAll }) {
     const { idFilme } = useParams();
     const [movieTimes, setMovieTimes] = useState(null);
 
@@ -16,7 +18,7 @@ export default function SessionsPage() {
     }, []);
 
     if (movieTimes === null) {
-        return <PageContainer><img src={loading}/></PageContainer>
+        return <PageContainer><img src={loading} /></PageContainer>
     }
 
     function TimeButtons(props) {
@@ -32,26 +34,31 @@ export default function SessionsPage() {
     }
 
     return (
-        <PageContainer>
-            Selecione o horário
-            <div>
-                {movieTimes.days.map((day) =>
-                    <SessionContainer key={day.id} data-test="movie-day">
-                        {day.weekday} - {day.date}
-                        <TimeButtons times={day.showtimes} />
-                    </SessionContainer>)
-                }
-            </div>
-
-            <FooterContainer data-test="footer">
+        <>
+            <NavBar clearAll={clearAll} link='/'>
+                <img src={arrow} />
+            </NavBar>
+            <PageContainer>
+                Selecione o horário
                 <div>
-                    <img src={movieTimes.posterURL} alt="poster" />
+                    {movieTimes.days.map((day) =>
+                        <SessionContainer key={day.id} data-test="movie-day">
+                            {day.weekday} - {day.date}
+                            <TimeButtons times={day.showtimes} />
+                        </SessionContainer>)
+                    }
                 </div>
-                <div>
-                    <p>{movieTimes.title}</p>
-                </div>
-            </FooterContainer>
 
-        </PageContainer>
+                <FooterContainer data-test="footer">
+                    <div>
+                        <img src={movieTimes.posterURL} alt="poster" />
+                    </div>
+                    <div>
+                        <p>{movieTimes.title}</p>
+                    </div>
+                </FooterContainer>
+
+            </PageContainer>
+        </>
     );
 }
