@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { BrowserRouter, Link, Route, Routes } from "react-router-dom";
 import styled from "styled-components";
 import HomePage from "./pages/HomePage/HomePage";
@@ -6,10 +7,20 @@ import SessionsPage from "./pages/SessionsPage/SessionsPage";
 import SuccessPage from "./pages/SuccessPage/SuccessPage";
 
 export default function App() {
+    const [selectedSeats, setSelectedSeats] = useState([]);
+    const [clientName, setClientName] = useState('');
+    const [clientCPF, setClientCPF] = useState('');
+
+    function clearAll() {
+        setSelectedSeats([]);
+        setClientName('');
+        setClientCPF('');
+    }
+
     return (
         <BrowserRouter>
             <NavContainer>
-                <Link to="/">
+                <Link to="/" onClick={clearAll}>
                     CINEFLEX
                 </Link>
             </NavContainer>
@@ -17,7 +28,15 @@ export default function App() {
             <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/sessoes/:idFilme" element={<SessionsPage />} />
-                <Route path="/assentos/:idFilme" element={<SeatsPage />} />
+                <Route path="/assentos/:idFilme" element={
+                    <SeatsPage
+                        selectedSeats={selectedSeats}
+                        setSelectedSeats={setSelectedSeats}
+                        clientName={clientName}
+                        setClientName={setClientName}
+                        clientCPF={clientCPF}
+                        setClientCPF={setClientCPF} />}
+                />
                 <Route path="/sucesso" element={<SuccessPage />} />
             </Routes>
         </BrowserRouter>
