@@ -2,6 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import loading from "../../assets/loading.svg";
 
 export default function HomePage() {
     const [moviesList, setMoviesList] = useState(null);
@@ -14,7 +15,7 @@ export default function HomePage() {
     }, []);
 
     if (moviesList === null) {
-        return <PageContainer>Carregando...</PageContainer>
+        return <PageContainer><img src={loading}/></PageContainer>
     }
 
     if (moviesList === 'Not Found') {

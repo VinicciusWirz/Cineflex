@@ -2,6 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { PageContainer, ButtonsContainer, SessionContainer, FooterContainer } from "./styled";
+import loading from "../../assets/loading.svg";
 
 export default function SessionsPage() {
     const { idFilme } = useParams();
@@ -15,7 +16,7 @@ export default function SessionsPage() {
     }, []);
 
     if (movieTimes === null) {
-        return <PageContainer>Carregando</PageContainer>
+        return <PageContainer><img src={loading}/></PageContainer>
     }
 
     function TimeButtons(props) {

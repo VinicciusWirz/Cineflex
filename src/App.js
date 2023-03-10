@@ -7,14 +7,10 @@ import SessionsPage from "./pages/SessionsPage/SessionsPage";
 import SuccessPage from "./pages/SuccessPage/SuccessPage";
 
 export default function App() {
-    const [selectedSeats, setSelectedSeats] = useState([]);
-    const [clientName, setClientName] = useState('');
-    const [clientCPF, setClientCPF] = useState('');
+    const [orderInfo, setOrderInfo] = useState({ movie: '', time: '', date: '', clientInfo: { name: '', cpf: '', seats: [] } });
 
     function clearAll() {
-        setSelectedSeats([]);
-        setClientName('');
-        setClientCPF('');
+        setOrderInfo({ movie: '', time: '', date: '', clientInfo: { name: '', cpf: '', seats: [] } });
     }
 
     return (
@@ -28,16 +24,9 @@ export default function App() {
             <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/sessoes/:idFilme" element={<SessionsPage />} />
-                <Route path="/assentos/:idFilme" element={
-                    <SeatsPage
-                        selectedSeats={selectedSeats}
-                        setSelectedSeats={setSelectedSeats}
-                        clientName={clientName}
-                        setClientName={setClientName}
-                        clientCPF={clientCPF}
-                        setClientCPF={setClientCPF} />}
+                <Route path="/assentos/:idFilme" element={<SeatsPage setOrderInfo={setOrderInfo} orderInfo={orderInfo} />} />
+                <Route path="/sucesso" element={<SuccessPage orderInfo={orderInfo} clearAll={clearAll} />}
                 />
-                <Route path="/sucesso" element={<SuccessPage />} />
             </Routes>
         </BrowserRouter>
     );

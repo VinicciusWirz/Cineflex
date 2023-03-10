@@ -10,6 +10,11 @@ export const PageContainer = styled.div`
     margin-top: 30px;
     padding-bottom: 120px;
     padding-top: 70px;
+    img {
+        width: 200px;
+        height: 200px;
+        align-self: center;
+    }
     div {
         margin-top: 20px;
     }
