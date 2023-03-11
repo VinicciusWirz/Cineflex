@@ -2,7 +2,6 @@ import styled from "styled-components";
 import { Link } from "react-router-dom";
 
 export default function SuccessPage({ orderInfo, clearAll }) {
-    // const formatedCPF = orderInfo.clientInfo.cpf.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, "$1.$2.$3-$4");
 
     return (
         <PageContainer>
@@ -23,12 +22,10 @@ export default function SuccessPage({ orderInfo, clearAll }) {
                 <strong><p>{'Comprador(es)'}</p></strong>
                 {orderInfo.clientInfo.clients.map((c) =>
                     <div key={c.id}>
-                        <p>Nome: {c.nome}</p>
+                        <p>Nome: {c.name}</p>
                         <p>CPF: {c.cpf.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, "$1.$2.$3-$4")}</p>
                     </div>
                 )}
-                {/* <p>Nome: {orderInfo.clientInfo.name}</p>
-                <p>CPF: {formatedCPF}</p> */}
             </TextContainer>
 
             <Link to="/" data-test="go-home-btn" onClick={clearAll}>

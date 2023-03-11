@@ -81,6 +81,9 @@ export const SeatItem = styled.div`
     align-items: center;
     justify-content: center;
     margin: 5px 3px;
+    &:hover{
+        cursor: pointer;
+    }
 `;
 
 export const FooterContainer = styled.div`

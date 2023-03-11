@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import SeatContent from "./components/SeatContent";
 import loading from "../../assets/loading.svg";
-import arrow from "../../assets/arrow.png";
 import NavBar from "../../components/NavBar";
 import { CaptionCircle, CaptionContainer, CaptionItem, FooterContainer, FormContainer, PageContainer, SeatsContainer } from "./styled";
 
@@ -13,12 +12,12 @@ export default function SeatsPage(props) {
     const [movieSeats, setMovieSeats] = useState(null);
     const [selectedSeats, setSelectedSeats] = useState([]);
     const [seatsNames, setSeatsNames] = useState([]);
-    const [movieId, setMovieId] = useState(0);
     const [buyers, setBuyers] = useState([]);
     useEffect(() => {
         const url = `https://mock-api.driven.com.br/api/v8/cineflex/showtimes/${idFilme}/seats`;
         setSelectedSeats([]);
         setSeatsNames([]);
+        setBuyers([]);
         props.setOrderInfo({
             movie: '',
             time: '',
@@ -28,7 +27,6 @@ export default function SeatsPage(props) {
                 seats: []
             }
         });
-        setBuyers([]);
         const promise = axios.get(url);
         promise.then(({ data }) => {
             setMovieSeats(data);
@@ -41,10 +39,8 @@ export default function SeatsPage(props) {
                     seats: []
                 }
             });
-            setMovieId(data.movie.id);
-            setBuyers([]);
         });
-        promise.catch((error) => console.log(error.response.data));
+        promise.catch((error) => alert(error.response.data));
     }, []);
 
     if (movieSeats === null) {
@@ -62,7 +58,7 @@ export default function SeatsPage(props) {
             if (!selectedSeatsArr.includes(seatId)) {
                 setSelectedSeats(seatsAddedArr);
                 setSeatsNames(seatsNumbersAddedArr.sort((a, b) => parseInt(a) - parseInt(b)));
-                setBuyers([...buyers, { id: seatId, nome: '', cpf: '' }].sort((a, b) => parseInt(a) - parseInt(b)));
+                setBuyers([...buyers, { id: seatId, name: '', cpf: '', number: seatNumber }].sort((a, b) => parseInt(a) - parseInt(b)));
             } else {
                 const deletionConfirmation = `Você deseja desselecionar o assento ${seatNumber}?`;
                 if (window.confirm(deletionConfirmation) === true) {
@@ -76,23 +72,20 @@ export default function SeatsPage(props) {
         }
     }
 
-    function handleInputsChanges(event, index, type) {
+    function handleInputsChanges(event) {
         const updateInputs = [...buyers];
-        if (type === 'nome') {
-            updateInputs[index].nome = event;
-            setBuyers(updateInputs);
+        const seatN = event.target.id.replace(/\D+/gi, '');
+        const updatedInputsFiltered = updateInputs.find((e) => e.number === seatN);
+        updatedInputsFiltered[event.target.name] = event.target.value;
+        if (event.target.name === 'cpf') {
+            updatedInputsFiltered[event.target.name] = event.target.value.replace(/\D+/gi, '');
         }
-        if (type === 'cpf') {
-            updateInputs[index].cpf = event;
-            setBuyers(updateInputs);
-        }
+        setBuyers(updateInputs);
     }
 
     return (
         <>
-            <NavBar clearAll={props.clearAll} link={`/sessoes/${movieId}`} >
-                <img src={arrow} />
-            </NavBar>
+            <NavBar clearAll={props.clearAll} />
 
             <PageContainer>
                 Selecione o(s) assento(s)
@@ -123,6 +116,7 @@ export default function SeatsPage(props) {
                 </CaptionContainer>
 
                 <FormContainer onSubmit={(event) => handleSubmit(
+                    setMovieSeats,
                     buyers,
                     selectedSeats,
                     navigate,
@@ -131,48 +125,35 @@ export default function SeatsPage(props) {
                     props.orderInfo,
                     seatsNames)}
                 >
-                    {seatsNames.length > 0 ? seatsNames.map((buyerSeat, i) =>
+                    {seatsNames.length > 0 && seatsNames.map((buyerSeat) =>
                         <div key={buyerSeat}>
-                            <label htmlFor={`name${i}`} >{`Nome do Comprador ${buyerSeat}:`}</label>
+                            <label htmlFor={`name${buyerSeat}`} >{`Nome do Comprador ${buyerSeat}:`}</label>
                             <input
-                                id={`name${i}`}
+                                id={`name${buyerSeat}`}
                                 placeholder="Digite seu nome..."
                                 data-test="client-name"
-                                onChange={(e) => handleInputsChanges(e.target.value, i, 'nome')}
-                                value={buyers[i].nome}
+                                name={'name'}
+                                onChange={(e) => handleInputsChanges(e)}
+                                value={buyers.find((e) => e.number === buyerSeat).name}
                                 required />
 
-                            <label htmlFor={`cpf${i}`}>{`CPF do Comprador ${buyerSeat}:`}</label>
+                            <label htmlFor={`cpf${buyerSeat}`}>{`CPF do Comprador ${buyerSeat}:`}</label>
                             <input
-                                id={`cpf${i}`}
+                                id={`cpf${buyerSeat}`}
                                 placeholder="Digite seu CPF..."
                                 data-test="client-cpf"
-                                onChange={(e) => handleInputsChanges(e.target.value, i, 'cpf')}
-                                value={buyers[i].cpf}
-                                required />
-                        </div>
-                    ) :
-                        <div>
-                            <label htmlFor='name' >Nome do Comprador:</label>
-                            <input
-                                id='name'
-                                placeholder="Digite seu nome..."
-                                data-test="client-name"
-                                value=""
-                                disabled
-                                required />
+                                name={'cpf'}
+                                onChange={(e) => handleInputsChanges(e)}
+                                value={buyers.find((e) => e.number === buyerSeat).cpf.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, "$1.$2.$3-$4")}
+                                required
+                                minLength={11}
+                                maxLength={14}
+                            />
+                        </div>)
+                    }
 
-                            <label htmlFor='cpf'>CPF do Comprador:</label>
-                            <input
-                                id='cpf'
-                                placeholder="Digite seu CPF..."
-                                data-test="client-cpf"
-                                disabled
-                                required />
-                        </div>}
-
-                    <button data-test="book-seat-btn" type='submit'>
-                        Reservar Assento(s)
+                    <button data-test="book-seat-btn" type='submit' disabled={seatsNames.length === 0}>
+                        {seatsNames.length === 0 ? 'Selecione o(s) assento(s) primeiro' : 'Reservar Assento(s)'}
                     </button>
                 </FormContainer>
 
@@ -190,36 +171,27 @@ export default function SeatsPage(props) {
     );
 }
 
-function handleSubmit(buyers, selectedSeats, navigate, event, setOrderInfo, orderInfo, seatsNames) {
+function handleSubmit(setMovieSeats, buyers, selectedSeats, navigate, event, setOrderInfo, orderInfo, seatsNames) {
     event.preventDefault();
-    const isCPFValid = cpfValidation(buyers);
-    const howManyBuyers = buyers.length;
+    const buyersAmount = buyers.length;
     const newOrder = { ...orderInfo };
+    const compradores = buyers.map((c) => ({ idAssento: c.id, nome: c.name, cpf: c.cpf.replace(/\D+/gi, '') }));
     newOrder.clientInfo = { clients: buyers, seats: seatsNames };
-    if (isCPFValid && howManyBuyers > 1) {
+    let body = {};
+    if (buyersAmount > 1) {
+        body = { ids: selectedSeats, compradores };
+    }
+    if (buyersAmount === 1) {
+        body = { ids: selectedSeats, name: compradores[0].nome, cpf: compradores[0].cpf };
+    }
+    if (buyersAmount >= 1) {
+        setMovieSeats(null);
         setOrderInfo(newOrder);
-        const body = { ids: selectedSeats, buyers };
         const url = 'https://mock-api.driven.com.br/api/v8/cineflex/seats/book-many';
         const promise = axios.post(url, body);
         promise.then(() => {
             navigate('/sucesso');
         });
-        promise.catch((error) => console.log(error.response.data));
+        promise.catch((error) => alert(error.response.data));
     }
-    if (isCPFValid && howManyBuyers === 1) {
-        setOrderInfo(newOrder);
-        const body = { ids: selectedSeats, name: buyers[0].nome, cpf: buyers[0].cpf };
-        const url = 'https://mock-api.driven.com.br/api/v8/cineflex/seats/book-many';
-        const promise = axios.post(url, body);
-        promise.then(() => {
-            navigate('/sucesso');
-        });
-        promise.catch((error) => console.log(error.response.data));
-    }
-}
-
-function cpfValidation(buyers) {
-    let aux = 0;
-    buyers.forEach((b) => b.cpf.replace(/\D+/gi, '').length === 11 && aux++);
-    return aux === buyers.length;
 }

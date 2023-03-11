@@ -3,16 +3,15 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import loading from "../../assets/loading.svg";
-import NavBar from "../../components/NavBar";
 
-export default function HomePage({ clearAll }) {
+export default function HomePage() {
     const [moviesList, setMoviesList] = useState(null);
 
     useEffect(() => {
         const url = "https://mock-api.driven.com.br/api/v8/cineflex/movies";
         const promise = axios.get(url);
         promise.then((answer) => setMoviesList(answer.data));
-        promise.catch((error) => setMoviesList(error.response.data));
+        promise.catch((error) => alert(error.response.data));
     }, []);
 
     if (moviesList === null) {

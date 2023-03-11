@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { PageContainer, ButtonsContainer, SessionContainer, FooterContainer } from "./styled";
 import loading from "../../assets/loading.svg";
-import arrow from "../../assets/arrow.png";
 import NavBar from "../../components/NavBar";
 
 export default function SessionsPage({ clearAll }) {
@@ -14,7 +13,7 @@ export default function SessionsPage({ clearAll }) {
         const url = `https://mock-api.driven.com.br/api/v8/cineflex/movies/${idFilme}/showtimes`;
         const promise = axios.get(url);
         promise.then((answer) => setMovieTimes(answer.data));
-        promise.catch((error) => console.log(error.response.data))
+        promise.catch((error) => alert(error.response.data))
     }, []);
 
     if (movieTimes === null) {
@@ -35,9 +34,7 @@ export default function SessionsPage({ clearAll }) {
 
     return (
         <>
-            <NavBar clearAll={clearAll} link='/'>
-                <img src={arrow} />
-            </NavBar>
+            <NavBar clearAll={clearAll} />
             <PageContainer>
                 Selecione o horário
                 <div>

@@ -1,12 +1,12 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import arrow from "../assets/arrow.png"
 
 export default function NavBar(props) {
+    const navigate = useNavigate();
     return (
         <NavContainer>
-            <Link to={props.link} onClick={props.clearAll} data-test="go-home-header-btn">
-                {props.children}
-            </Link>
+            <img src={arrow} data-test="go-home-header-btn" onClick={() => navigate(-1)}/>
             <Link to="/" onClick={props.clearAll}>
                 CINEFLEX
             </Link>
@@ -29,10 +29,11 @@ const NavContainer = styled.div`
     a {
         text-decoration: none;
         color: #E8833A;
-        &:first-child{
-            position: absolute;
-            left: 18px;
-            top: 20px;
-        }
+    }
+    img{
+        position: absolute;
+        left: 18px;
+        top: 50%;
+        transform: translateY(-50%)
     }
 `;
