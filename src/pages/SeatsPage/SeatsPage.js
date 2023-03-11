@@ -60,12 +60,12 @@ export default function SeatsPage(props) {
                 setSeatsNames(seatsNumbersAddedArr.sort((a, b) => parseInt(a) - parseInt(b)));
                 setBuyers([...buyers, { id: seatId, name: '', cpf: '', number: seatNumber }].sort((a, b) => parseInt(a) - parseInt(b)));
             } else {
-                const deletionConfirmation = `Você deseja desselecionar o assento ${seatNumber}?`;
-                if (window.confirm(deletionConfirmation) === true) {
+                // const deletionConfirmation = `Você deseja desselecionar o assento ${seatNumber}?`;
+                // if (window.confirm(deletionConfirmation) === true) {
                     setSelectedSeats(seatsRemovedArr);
                     setSeatsNames(seatsNumbersRemovedArr.sort((a, b) => parseInt(a) - parseInt(b)));
                     setBuyers(buyers.filter((e) => e.id !== seatId));
-                }
+                // }
             }
         } else {
             alert('Assento indisponivel, por favor selecione outro');
