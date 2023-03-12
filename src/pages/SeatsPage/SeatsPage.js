@@ -10,13 +10,9 @@ export default function SeatsPage(props) {
     const navigate = useNavigate();
     const { idFilme } = useParams();
     const [movieSeats, setMovieSeats] = useState(null);
-    const [selectedSeats, setSelectedSeats] = useState([]);
-    const [seatsNames, setSeatsNames] = useState([]);
     const [buyers, setBuyers] = useState([]);
     useEffect(() => {
         const url = `https://mock-api.driven.com.br/api/v8/cineflex/showtimes/${idFilme}/seats`;
-        setSelectedSeats([]);
-        setSeatsNames([]);
         setBuyers([]);
         props.setOrderInfo({
             movie: '',
@@ -48,24 +44,14 @@ export default function SeatsPage(props) {
     }
 
     function selectSeat(seatId, seatNumber, availability) {
-        const selectedSeatsArr = selectedSeats;
-        const seatsNamesArr = seatsNames;
+        const seatIsSelected = buyers.some((client) => client.id === seatId);
         if (availability) {
-            const seatsAddedArr = [...selectedSeatsArr, seatId];
-            const seatsRemovedArr = [...selectedSeatsArr].filter((s) => s !== seatId);
-            const seatsNumbersAddedArr = [...seatsNamesArr, seatNumber];
-            const seatsNumbersRemovedArr = [...seatsNamesArr].filter((s) => s !== seatNumber);
-            if (!selectedSeatsArr.includes(seatId)) {
-                const seatsNumbersAddedArrOrganized = seatsNumbersAddedArr.sort((a, b) => parseInt(a) - parseInt(b));
-                const buyersOrganized = [...buyers, { id: seatId, name: '', cpf: '', number: seatNumber }].sort((a, b) => parseInt(a) - parseInt(b));
-                setSelectedSeats(seatsAddedArr);
-                setSeatsNames(seatsNumbersAddedArrOrganized);
+            if (!seatIsSelected) {
+                const buyersOrganized = [...buyers, { id: seatId, name: '', cpf: '', number: seatNumber }].sort((a, b) => parseInt(a.id) - parseInt(b.id));
                 setBuyers(buyersOrganized);
             } else {
                 const deletionConfirmation = `Você deseja desselecionar o assento ${seatNumber}?`;
                 if (window.confirm(deletionConfirmation) === true) {
-                    setSelectedSeats(seatsRemovedArr);
-                    setSeatsNames(seatsNumbersRemovedArr.sort((a, b) => parseInt(a) - parseInt(b)));
                     setBuyers(buyers.filter((e) => e.id !== seatId));
                 }
             }
@@ -75,8 +61,8 @@ export default function SeatsPage(props) {
     }
 
     function handleInputsChanges(event) {
-        const updateInputs = [...buyers];
         const seatN = event.target.id.replace(/\D+/gi, '');
+        const updateInputs = [...buyers];
         const updatedInputsFiltered = updateInputs.find((e) => e.number === seatN);
         updatedInputsFiltered[event.target.name] = event.target.value;
         if (event.target.name === 'cpf') {
@@ -97,9 +83,8 @@ export default function SeatsPage(props) {
                         seatId={seat.id}
                         seatNumber={seat.name}
                         availability={seat.isAvailable}
-                        selectedSeats={selectedSeats}
                         selectSeat={selectSeat}
-                        setSelectedSeats={setSelectedSeats} />)}
+                        buyers={buyers} />)}
                 </SeatsContainer>
 
                 <CaptionContainer>
@@ -120,32 +105,31 @@ export default function SeatsPage(props) {
                 <FormContainer onSubmit={(event) => handleSubmit(
                     setMovieSeats,
                     buyers,
-                    selectedSeats,
                     navigate,
                     event,
                     props.setOrderInfo,
                     props.orderInfo)}
                 >
-                    {seatsNames.length > 0 && seatsNames.map((buyerSeat) =>
-                        <div key={buyerSeat}>
-                            <label htmlFor={`name${buyerSeat}`} >{`Nome do Comprador ${buyerSeat}:`}</label>
+                    {buyers.length > 0 && buyers.map((buyerSeat) =>
+                        <div key={buyerSeat.number}>
+                            <label htmlFor={`name${buyerSeat.number}`} >{`Nome do Comprador ${buyerSeat.number}:`}</label>
                             <input
-                                id={`name${buyerSeat}`}
+                                id={`name${buyerSeat.number}`}
                                 placeholder="Digite seu nome..."
                                 data-test="client-name"
                                 name={'name'}
                                 onChange={(e) => handleInputsChanges(e)}
-                                value={buyers.find((e) => e.number === buyerSeat).name}
+                                value={buyers.find((e) => e.number === buyerSeat.number).name}
                                 required />
 
-                            <label htmlFor={`cpf${buyerSeat}`}>{`CPF do Comprador ${buyerSeat}:`}</label>
+                            <label htmlFor={`cpf${buyerSeat.number}`}>{`CPF do Comprador ${buyerSeat.number}:`}</label>
                             <input
-                                id={`cpf${buyerSeat}`}
+                                id={`cpf${buyerSeat.number}`}
                                 placeholder="Digite seu CPF..."
                                 data-test="client-cpf"
                                 name={'cpf'}
                                 onChange={(e) => handleInputsChanges(e)}
-                                value={buyers.find((e) => e.number === buyerSeat).cpf.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, "$1.$2.$3-$4")}
+                                value={buyers.find((e) => e.number === buyerSeat.number).cpf.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, "$1.$2.$3-$4")}
                                 required
                                 minLength={11}
                                 maxLength={14}
@@ -153,8 +137,8 @@ export default function SeatsPage(props) {
                         </div>)
                     }
 
-                    <button data-test="book-seat-btn" type='submit' disabled={seatsNames.length === 0}>
-                        {seatsNames.length === 0 ? 'Selecione o(s) assento(s) primeiro' : 'Reservar Assento(s)'}
+                    <button data-test="book-seat-btn" type='submit' disabled={buyers.length === 0}>
+                        {buyers.length === 0 ? 'Selecione o(s) assento(s) primeiro' : 'Reservar Assento(s)'}
                     </button>
                 </FormContainer>
 
@@ -172,19 +156,20 @@ export default function SeatsPage(props) {
     );
 }
 
-function handleSubmit(setMovieSeats, buyers, selectedSeats, navigate, event, setOrderInfo, orderInfo) {
+function handleSubmit(setMovieSeats, buyers, navigate, event, setOrderInfo, orderInfo) {
     event.preventDefault();
     const buyersAmount = buyers.length;
-    const newOrder = { ...orderInfo };
     const compradores = buyers.map((c) => ({ idAssento: c.id, nome: c.name, cpf: c.cpf.replace(/\D+/gi, '') }));
-    const seatsNumbers = getNumbers(buyers);
-    newOrder.clientInfo = { clients: buyers, seats: seatsNumbers };
+    const selectedSeatsNumbers = buyers.map((c) => c.number);
+    const selectedSeatsIds = buyers.map((c) => c.id);
+    const newOrder = { ...orderInfo };
+    newOrder.clientInfo = { clients: buyers, seats: selectedSeatsNumbers };
     let body = {};
     if (buyersAmount > 1) {
-        body = { ids: selectedSeats, compradores };
+        body = { ids: selectedSeatsIds, compradores };
     }
     if (buyersAmount === 1) {
-        body = { ids: selectedSeats, name: compradores[0].nome, cpf: compradores[0].cpf };
+        body = { ids: selectedSeatsIds, name: compradores[0].nome, cpf: compradores[0].cpf };
     }
     if (buyersAmount >= 1) {
         setMovieSeats(null);
@@ -196,10 +181,4 @@ function handleSubmit(setMovieSeats, buyers, selectedSeats, navigate, event, set
         });
         promise.catch((error) => alert(error.response.data));
     }
-}
-
-function getNumbers(buyers) {
-    const seatNumbersArray = [];
-    buyers.forEach((b) => seatNumbersArray.push(b.number));
-    return seatNumbersArray;
 }

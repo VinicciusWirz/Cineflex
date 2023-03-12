@@ -34,6 +34,9 @@ const GlobalStyle = createGlobalStyle`
 			font-style: italic;
 		}
 	}
+	button{
+		cursor: pointer;
+	}
 `;
 
 export default GlobalStyle;

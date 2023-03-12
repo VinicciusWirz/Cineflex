@@ -34,6 +34,7 @@ const NavContainer = styled.div`
         position: absolute;
         left: 18px;
         top: 50%;
-        transform: translateY(-50%)
+        transform: translateY(-50%);
+        cursor: pointer;
     }
 `;

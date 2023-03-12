@@ -20,7 +20,7 @@ export default function SuccessPage({ orderInfo }) {
             </TextContainer>
 
             <TextContainer data-test="client-info">
-                <strong><p>{orderInfo.clientInfo.clients > 1 ? 'Comprador(es)' : 'Comprador'}</p></strong>
+                <strong><p>{orderInfo.clientInfo.clients.length > 1 ? 'Comprador(es)' : 'Comprador'}</p></strong>
                 {orderInfo.clientInfo.clients.map((c) =>
                     <div key={c.id}>
                         <p>Nome: {c.name}</p>
