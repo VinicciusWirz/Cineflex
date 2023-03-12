@@ -56,16 +56,18 @@ export default function SeatsPage(props) {
             const seatsNumbersAddedArr = [...seatsNamesArr, seatNumber];
             const seatsNumbersRemovedArr = [...seatsNamesArr].filter((s) => s !== seatNumber);
             if (!selectedSeatsArr.includes(seatId)) {
+                const seatsNumbersAddedArrOrganized = seatsNumbersAddedArr.sort((a, b) => parseInt(a) - parseInt(b));
+                const buyersOrganized = [...buyers, { id: seatId, name: '', cpf: '', number: seatNumber }].sort((a, b) => parseInt(a) - parseInt(b));
                 setSelectedSeats(seatsAddedArr);
-                setSeatsNames(seatsNumbersAddedArr.sort((a, b) => parseInt(a) - parseInt(b)));
-                setBuyers([...buyers, { id: seatId, name: '', cpf: '', number: seatNumber }].sort((a, b) => parseInt(a) - parseInt(b)));
+                setSeatsNames(seatsNumbersAddedArrOrganized);
+                setBuyers(buyersOrganized);
             } else {
-                // const deletionConfirmation = `Você deseja desselecionar o assento ${seatNumber}?`;
-                // if (window.confirm(deletionConfirmation) === true) {
+                const deletionConfirmation = `Você deseja desselecionar o assento ${seatNumber}?`;
+                if (window.confirm(deletionConfirmation) === true) {
                     setSelectedSeats(seatsRemovedArr);
                     setSeatsNames(seatsNumbersRemovedArr.sort((a, b) => parseInt(a) - parseInt(b)));
                     setBuyers(buyers.filter((e) => e.id !== seatId));
-                // }
+                }
             }
         } else {
             alert('Assento indisponivel, por favor selecione outro');
@@ -85,7 +87,7 @@ export default function SeatsPage(props) {
 
     return (
         <>
-            <NavBar clearAll={props.clearAll} />
+            <NavBar />
 
             <PageContainer>
                 Selecione o(s) assento(s)
@@ -122,8 +124,7 @@ export default function SeatsPage(props) {
                     navigate,
                     event,
                     props.setOrderInfo,
-                    props.orderInfo,
-                    seatsNames)}
+                    props.orderInfo)}
                 >
                     {seatsNames.length > 0 && seatsNames.map((buyerSeat) =>
                         <div key={buyerSeat}>
@@ -171,12 +172,13 @@ export default function SeatsPage(props) {
     );
 }
 
-function handleSubmit(setMovieSeats, buyers, selectedSeats, navigate, event, setOrderInfo, orderInfo, seatsNames) {
+function handleSubmit(setMovieSeats, buyers, selectedSeats, navigate, event, setOrderInfo, orderInfo) {
     event.preventDefault();
     const buyersAmount = buyers.length;
     const newOrder = { ...orderInfo };
     const compradores = buyers.map((c) => ({ idAssento: c.id, nome: c.name, cpf: c.cpf.replace(/\D+/gi, '') }));
-    newOrder.clientInfo = { clients: buyers, seats: seatsNames };
+    const seatsNumbers = getNumbers(buyers);
+    newOrder.clientInfo = { clients: buyers, seats: seatsNumbers };
     let body = {};
     if (buyersAmount > 1) {
         body = { ids: selectedSeats, compradores };
@@ -194,4 +196,10 @@ function handleSubmit(setMovieSeats, buyers, selectedSeats, navigate, event, set
         });
         promise.catch((error) => alert(error.response.data));
     }
+}
+
+function getNumbers(buyers) {
+    const seatNumbersArray = [];
+    buyers.forEach((b) => seatNumbersArray.push(b.number));
+    return seatNumbersArray;
 }

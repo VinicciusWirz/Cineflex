@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BrowserRouter, Link, Route, Routes } from "react-router-dom";
 import styled from "styled-components";
 import HomePage from "./pages/HomePage/HomePage";
@@ -9,23 +9,23 @@ import SuccessPage from "./pages/SuccessPage/SuccessPage";
 export default function App() {
     const [orderInfo, setOrderInfo] = useState({ movie: '', time: '', date: '', clientInfo: { clients: [], seats: [] } });
 
-    function clearAll() {
+    useEffect(() => {
         setOrderInfo({ movie: '', time: '', date: '', clientInfo: { clients: [], seats: [] } });
-    }
+    }, []);
 
     return (
         <BrowserRouter>
             <NavContainer>
-                <Link to="/" onClick={clearAll}>
+                <Link to="/">
                     CINEFLEX
                 </Link>
             </NavContainer>
 
             <Routes>
-                <Route path="/" element={<HomePage clearAll={clearAll} />} />
-                <Route path="/sessoes/:idFilme" element={<SessionsPage clearAll={clearAll} />} />
+                <Route path="/" element={<HomePage />} />
+                <Route path="/sessoes/:idFilme" element={<SessionsPage />} />
                 <Route path="/assentos/:idFilme" element={<SeatsPage setOrderInfo={setOrderInfo} orderInfo={orderInfo} />} />
-                <Route path="/sucesso" element={<SuccessPage orderInfo={orderInfo} clearAll={clearAll} />} />
+                <Route path="/sucesso" element={<SuccessPage orderInfo={orderInfo} />} />
             </Routes>
         </BrowserRouter>
     );

@@ -5,7 +5,7 @@ import { PageContainer, ButtonsContainer, SessionContainer, FooterContainer } fr
 import loading from "../../assets/loading.svg";
 import NavBar from "../../components/NavBar";
 
-export default function SessionsPage({ clearAll }) {
+export default function SessionsPage() {
     const { idFilme } = useParams();
     const [movieTimes, setMovieTimes] = useState(null);
 
@@ -13,11 +13,11 @@ export default function SessionsPage({ clearAll }) {
         const url = `https://mock-api.driven.com.br/api/v8/cineflex/movies/${idFilme}/showtimes`;
         const promise = axios.get(url);
         promise.then((answer) => setMovieTimes(answer.data));
-        promise.catch((error) => alert(error.response.data))
+        promise.catch((error) => alert(error.response.data));
     }, []);
 
     if (movieTimes === null) {
-        return <PageContainer><img src={loading} /></PageContainer>
+        return <PageContainer><img src={loading} /></PageContainer>;
     }
 
     function TimeButtons(props) {
@@ -34,7 +34,7 @@ export default function SessionsPage({ clearAll }) {
 
     return (
         <>
-            <NavBar clearAll={clearAll} />
+            <NavBar/>
             <PageContainer>
                 Selecione o horário
                 <div>

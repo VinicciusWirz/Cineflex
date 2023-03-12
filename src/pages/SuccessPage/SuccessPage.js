@@ -1,7 +1,8 @@
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 
-export default function SuccessPage({ orderInfo, clearAll }) {
+export default function SuccessPage({ orderInfo }) {
+    const decimal = 10;
 
     return (
         <PageContainer>
@@ -15,11 +16,11 @@ export default function SuccessPage({ orderInfo, clearAll }) {
 
             <TextContainer data-test="seats-info">
                 <strong><p>Ingressos</p></strong>
-                {orderInfo.clientInfo.seats.map((seat) => <p key={seat}>Assento {Number(seat) < 10 ? `0${seat}` : seat}</p>)}
+                {orderInfo.clientInfo.seats.map((seat) => <p key={seat}>Assento {Number(seat) < decimal ? `0${seat}` : seat}</p>)}
             </TextContainer>
 
             <TextContainer data-test="client-info">
-                <strong><p>{'Comprador(es)'}</p></strong>
+                <strong><p>{orderInfo.clientInfo.clients > 1 ? 'Comprador(es)' : 'Comprador'}</p></strong>
                 {orderInfo.clientInfo.clients.map((c) =>
                     <div key={c.id}>
                         <p>Nome: {c.name}</p>
@@ -28,7 +29,7 @@ export default function SuccessPage({ orderInfo, clearAll }) {
                 )}
             </TextContainer>
 
-            <Link to="/" data-test="go-home-btn" onClick={clearAll}>
+            <Link to="/" data-test="go-home-btn" >
                 <button>
                     Voltar para Home
                 </button>
@@ -64,7 +65,7 @@ const PageContainer = styled.div`
         text-align: center;
         color: #247A6B;
     }
-`
+`;
 const TextContainer = styled.div`
     width: 100%;
     display: flex;

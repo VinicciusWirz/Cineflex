@@ -1,13 +1,13 @@
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import arrow from "../assets/arrow.png"
+import arrow from "../assets/arrow.png";
 
-export default function NavBar(props) {
+export default function NavBar() {
     const navigate = useNavigate();
     return (
         <NavContainer>
-            <img src={arrow} data-test="go-home-header-btn" onClick={() => navigate(-1)}/>
-            <Link to="/" onClick={props.clearAll}>
+            <img src={arrow} data-test="go-home-header-btn" onClick={() => navigate(-1)} />
+            <Link to="/" >
                 CINEFLEX
             </Link>
         </NavContainer>

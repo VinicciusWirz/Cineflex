@@ -15,11 +15,11 @@ export default function HomePage() {
     }, []);
 
     if (moviesList === null) {
-        return <PageContainer><img src={loading} /></PageContainer>
+        return <PageContainer><img src={loading} /></PageContainer>;
     }
 
     if (moviesList === 'Not Found') {
-        return <PageContainer>{moviesList}</PageContainer>
+        return <PageContainer>{moviesList}</PageContainer>;
     }
 
     return (
@@ -50,14 +50,14 @@ const PageContainer = styled.div`
     color: #293845;
     margin-top: 30px;
     padding-top: 70px;
-`
+`;
 const ListContainer = styled.div`
     width: 330px;
     display: flex;
     flex-wrap: wrap;
     flex-direction: row;
     padding: 10px;
-`
+`;
 const MovieContainer = styled.div`
     width: 145px;
     height: 210px;
